@@ -114,7 +114,7 @@ def pregunta_07():
     E    67
     Name: _c2, dtype: int64
     """
-    return
+    return tbl0.groupby('_c1').sum()['_c2']
 
 
 def pregunta_08():
