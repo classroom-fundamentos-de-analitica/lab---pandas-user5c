@@ -212,7 +212,20 @@ def pregunta_11():
     38   38      d,e
     39   39    a,d,f
     """
-    return
+    tbl1cp = tbl1.copy()
+
+    c0unique = pd.DataFrame({'_c0': tbl1cp.sort_values(by='_c0')['_c0'].unique()})
+    c4grouped = pd.DataFrame({'_c4': tbl1cp.groupby('_c0')['_c4'].apply(sorted).apply(','.join)})
+    
+    result = pd.concat(
+        [
+            c0unique,
+            c4grouped,
+        ],
+        axis=1
+    )
+    return result
+
 
 
 def pregunta_12():
