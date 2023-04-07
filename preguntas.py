@@ -243,7 +243,20 @@ def pregunta_12():
     38   38                    eee:0,fff:9,iii:2
     39   39                    ggg:3,hhh:8,jjj:5
     """
-    return
+    tbl2cp = tbl2.copy()
+    tbl2cp['_c5'] = tbl2cp['_c5a'] + ':' + tbl2cp['_c5b'].apply(lambda x: str(x))
+    c0unique = pd.DataFrame({'_c0': tbl2cp.sort_values(by='_c0')['_c0'].unique()})
+    
+    c5grouped = pd.DataFrame({'_c5': tbl2cp.groupby('_c0')['_c5'].apply(sorted).apply(','.join)})
+    
+    result = pd.concat(
+        [
+            c0unique,
+            c5grouped,
+        ],
+        axis=1
+    )
+    return result
 
 
 def pregunta_13():
