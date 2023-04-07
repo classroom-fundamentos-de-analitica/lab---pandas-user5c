@@ -180,8 +180,20 @@ def pregunta_10():
     2   C                    0:5:6:7:9
     3   D                  1:2:3:5:5:7
     4   E  1:1:2:3:3:4:5:5:5:6:7:8:8:9
-    """
-    return
+    """ 
+    tbl0cp = tbl0.copy()
+    tbl0cp['_c2'] = tbl0cp['_c2'].apply(str)
+
+    c1unique = pd.DataFrame({'_c1': tbl0cp.sort_values(by='_c1')['_c1'].unique()})
+    
+    result = pd.merge(
+        c1unique,
+        tbl0cp.groupby('_c1')['_c2'].apply(sorted).apply(':'.join),
+        on='_c1'
+    )
+    result = result.set_index('_c1')
+
+    return result
 
 
 def pregunta_11():
