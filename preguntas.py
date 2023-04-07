@@ -94,7 +94,11 @@ def pregunta_06():
     ['A', 'B', 'C', 'D', 'E', 'F', 'G']
 
     """
-    return
+    return sorted(
+        tbl1["_c4"].map(
+            lambda w: w.upper()
+        ).unique()
+    )
 
 
 def pregunta_07():
