@@ -132,7 +132,14 @@ def pregunta_08():
     39   39   E    5  1998-01-26    44
 
     """
-    return
+    sum_column = pd.DataFrame({'suma': tbl0['_c0'] + tbl0['_c2']})
+    return pd.concat(
+        [
+            tbl0,
+            sum_column
+        ],
+        axis=1
+    )
 
 
 def pregunta_09():
