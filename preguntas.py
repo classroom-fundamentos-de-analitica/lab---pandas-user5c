@@ -157,7 +157,14 @@ def pregunta_09():
     39   39   E    5  1998-01-26  1998
 
     """
-    return
+    year_column = pd.DataFrame({'year': tbl0['_c3'].map(lambda date: date.split('-')[0])})
+    return pd.concat(
+        [
+            tbl0,
+            year_column
+        ],
+        axis=1
+    )
 
 
 def pregunta_10():
