@@ -273,4 +273,36 @@ def pregunta_13():
     E    275
     Name: _c5b, dtype: int64
     """
-    return
+    # Crear copia de los dataframes originales
+    tbl0cp = tbl0.copy()
+    tbl2cp = tbl2.copy()
+
+    # Agrupar por '_c0' y crear una lista con los valores no repetidos. Luego crear un DataFrame
+    # nombrando la columna como '_c0'
+    c0unique = pd.DataFrame({'_c0': tbl2cp.sort_values(by='_c0')['_c0'].unique()})
+
+    # Agrupar por '_c0' y sumar la columna '_c5b' por cada grupo. Luego crear un DataFrame
+    # nombrando la columna como '_c5'
+    c5badded = pd.DataFrame({'_c5': tbl2cp.groupby('_c0')['_c5b'].agg(sum)})
+
+    # Concatenar los dos dataframes. Es posible porque tiene el mismo length de filas (axis=1)
+    tbl2computed = pd.concat(
+        [
+            c0unique,
+            c5badded,
+        ],
+        axis=1
+    )
+
+    # Unir el Dataframe tbl0cp con el resultado computado del dataframe tbl0cp(tbl2computed)
+    # por medio de la columna en comun '_c0'
+    tmp_result = pd.merge(
+        tbl0cp,
+        tbl2computed,
+        on='_c0'
+    )
+
+    # Agrupar por '_c5' y crear una lista con los valores no repetidos desde el dataframe 'tmp_result'.
+    result = tmp_result.groupby('_c1')['_c5'].agg(sum)
+
+    return result
