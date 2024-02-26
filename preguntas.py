@@ -22,7 +22,7 @@ def pregunta_01():
     40
 
     """
-    return
+    return len(tbl0)
 
 
 def pregunta_02():
@@ -33,7 +33,7 @@ def pregunta_02():
     4
 
     """
-    return
+    return len(tbl0.columns)
 
 
 def pregunta_03():
@@ -50,7 +50,7 @@ def pregunta_03():
     Name: _c1, dtype: int64
 
     """
-    return
+    return tbl0.groupby('_c1').count()['_c0']
 
 
 def pregunta_04():
@@ -65,7 +65,7 @@ def pregunta_04():
     E    4.785714
     Name: _c2, dtype: float64
     """
-    return
+    return tbl0.groupby('_c1')['_c2'].mean()
 
 
 def pregunta_05():
@@ -82,7 +82,7 @@ def pregunta_05():
     E    9
     Name: _c2, dtype: int64
     """
-    return
+    return tbl0.groupby('_c1')['_c2'].max()
 
 
 def pregunta_06():
@@ -94,7 +94,11 @@ def pregunta_06():
     ['A', 'B', 'C', 'D', 'E', 'F', 'G']
 
     """
-    return
+    return sorted(
+        tbl1["_c4"].map(
+            lambda w: w.upper()
+        ).unique()
+    )
 
 
 def pregunta_07():
@@ -110,7 +114,7 @@ def pregunta_07():
     E    67
     Name: _c2, dtype: int64
     """
-    return
+    return tbl0.groupby('_c1').sum()['_c2']
 
 
 def pregunta_08():
@@ -128,7 +132,14 @@ def pregunta_08():
     39   39   E    5  1998-01-26    44
 
     """
-    return
+    sum_column = pd.DataFrame({'suma': tbl0['_c0'] + tbl0['_c2']})
+    return pd.concat(
+        [
+            tbl0,
+            sum_column
+        ],
+        axis=1
+    )
 
 
 def pregunta_09():
@@ -146,7 +157,14 @@ def pregunta_09():
     39   39   E    5  1998-01-26  1998
 
     """
-    return
+    year_column = pd.DataFrame({'year': tbl0['_c3'].map(lambda date: date.split('-')[0])})
+    return pd.concat(
+        [
+            tbl0,
+            year_column
+        ],
+        axis=1
+    )
 
 
 def pregunta_10():
@@ -162,8 +180,20 @@ def pregunta_10():
     2   C                    0:5:6:7:9
     3   D                  1:2:3:5:5:7
     4   E  1:1:2:3:3:4:5:5:5:6:7:8:8:9
-    """
-    return
+    """ 
+    tbl0cp = tbl0.copy()
+    tbl0cp['_c2'] = tbl0cp['_c2'].apply(str)
+
+    c1unique = pd.DataFrame({'_c1': tbl0cp.sort_values(by='_c1')['_c1'].unique()})
+    
+    result = pd.merge(
+        c1unique,
+        tbl0cp.groupby('_c1')['_c2'].apply(sorted).apply(':'.join),
+        on='_c1'
+    )
+    result = result.set_index('_c1')
+
+    return result
 
 
 def pregunta_11():
@@ -182,7 +212,20 @@ def pregunta_11():
     38   38      d,e
     39   39    a,d,f
     """
-    return
+    tbl1cp = tbl1.copy()
+
+    c0unique = pd.DataFrame({'_c0': tbl1cp.sort_values(by='_c0')['_c0'].unique()})
+    c4grouped = pd.DataFrame({'_c4': tbl1cp.groupby('_c0')['_c4'].apply(sorted).apply(','.join)})
+    
+    result = pd.concat(
+        [
+            c0unique,
+            c4grouped,
+        ],
+        axis=1
+    )
+    return result
+
 
 
 def pregunta_12():
@@ -200,7 +243,20 @@ def pregunta_12():
     38   38                    eee:0,fff:9,iii:2
     39   39                    ggg:3,hhh:8,jjj:5
     """
-    return
+    tbl2cp = tbl2.copy()
+    tbl2cp['_c5'] = tbl2cp['_c5a'] + ':' + tbl2cp['_c5b'].apply(lambda x: str(x))
+    c0unique = pd.DataFrame({'_c0': tbl2cp.sort_values(by='_c0')['_c0'].unique()})
+    
+    c5grouped = pd.DataFrame({'_c5': tbl2cp.groupby('_c0')['_c5'].apply(sorted).apply(','.join)})
+    
+    result = pd.concat(
+        [
+            c0unique,
+            c5grouped,
+        ],
+        axis=1
+    )
+    return result
 
 
 def pregunta_13():
@@ -217,4 +273,36 @@ def pregunta_13():
     E    275
     Name: _c5b, dtype: int64
     """
-    return
+    # Crear copia de los dataframes originales
+    tbl0cp = tbl0.copy()
+    tbl2cp = tbl2.copy()
+
+    # Agrupar por '_c0' y crear una lista con los valores no repetidos. Luego crear un DataFrame
+    # nombrando la columna como '_c0'
+    c0unique = pd.DataFrame({'_c0': tbl2cp.sort_values(by='_c0')['_c0'].unique()})
+
+    # Agrupar por '_c0' y sumar la columna '_c5b' por cada grupo. Luego crear un DataFrame
+    # nombrando la columna como '_c5'
+    c5badded = pd.DataFrame({'_c5': tbl2cp.groupby('_c0')['_c5b'].agg(sum)})
+
+    # Concatenar los dos dataframes. Es posible porque tiene el mismo length de filas (axis=1)
+    tbl2computed = pd.concat(
+        [
+            c0unique,
+            c5badded,
+        ],
+        axis=1
+    )
+
+    # Unir el Dataframe tbl0cp con el resultado computado del dataframe tbl0cp(tbl2computed)
+    # por medio de la columna en comun '_c0'
+    tmp_result = pd.merge(
+        tbl0cp,
+        tbl2computed,
+        on='_c0'
+    )
+
+    # Agrupar por '_c5' y crear una lista con los valores no repetidos desde el dataframe 'tmp_result'.
+    result = tmp_result.groupby('_c1')['_c5'].agg(sum)
+
+    return result
